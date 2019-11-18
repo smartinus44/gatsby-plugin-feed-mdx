@@ -1,6 +1,6 @@
 # gatsby-plugin-feed-mdx
 
-Create an RSS feed (or multiple feeds) for your Gatsby site.
+This is a fork of [gatsby-plugin-feed](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-feed). Create an RSS feed (or multiple feeds) for your Gatsby site with MDX.
 
 ## Install
 
