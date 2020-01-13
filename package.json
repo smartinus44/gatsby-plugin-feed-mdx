@@ -2,9 +2,9 @@
   "name": "gatsby-plugin-feed-mdx",
   "description": "Creates an RSS feed for your Gatsby MDX site.",
   "version": "1.0.0",
-  "author": "Thomas Wang <thomas@wang.sh",
+  "author": "Thomas Wang <thomas@wang.sh>",
   "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
+    "url": "https://github.com/thomaswang/gatsby-plugin-feed-mdx/issues"
   },
   "dependencies": {
     "@babel/runtime": "^7.7.2",
@@ -19,7 +19,7 @@
     "babel-preset-gatsby-package": "^0.2.10",
     "cross-env": "^5.2.1"
   },
-  "homepage": "https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-feed#readme",
+  "homepage": "https://github.com/thomaswang/gatsby-plugin-feed-mdx",
   "keywords": [
     "atom",
     "feed",
@@ -35,8 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby.git",
-    "directory": "packages/gatsby-plugin-feed"
+    "url": "https://github.com/thomaswang/gatsby-plugin-feed-mdx",
   },
   "scripts": {
     "build": "babel src --out-dir . --ignore **/__tests__",
