@@ -1,153 +1,18 @@
 jest.mock(`fs-extra`);
 const fs = require(`fs-extra`);
 const path = require(`path`);
-const { onPreBootstrap, onPostBuild } = require(`../gatsby-node`);
+const { onPostBuild } = require(`../gatsby-node`);
 const DATE_TO_USE = new Date(`2018`);
 const _Date = Date;
 global.Date = jest.fn(() => DATE_TO_USE);
 global.Date.UTC = _Date.UTC;
 global.Date.now = _Date.now;
 
-describe(`Test plugin feed`, async () => {
+describe(`Test plugin feed`, () => {
   beforeEach(() => {
     fs.exists = jest.fn().mockResolvedValue(true);
     fs.writeFile = jest.fn().mockResolvedValue();
     fs.mkdirp = jest.fn().mockResolvedValue();
-  });
-
-  describe(`options validation`, () => {
-    const setup = async options => {
-      const reporter = {
-        stripIndent: jest.fn(value => value.trim()),
-        warn: jest.fn()
-      };
-      await onPreBootstrap({ reporter }, options);
-
-      return [reporter, options];
-    };
-
-    const deprecationNotice = `This behavior will be removed in the next major release of gatsby-plugin-feed`;
-
-    it(`removes plugins`, async () => {
-      const options = { plugins: [] };
-
-      await setup(options);
-
-      expect(options.plugins).toBeUndefined();
-    });
-
-    it(`warns when feeds is not supplied`, async () => {
-      const options = {};
-
-      const [reporter] = await setup(options);
-
-      expect(reporter.warn).toHaveBeenCalledTimes(1);
-      expect(reporter.warn).toHaveBeenCalledWith(
-        expect.stringContaining(deprecationNotice)
-      );
-    });
-
-    it(`warns when individual feed does not have title`, async () => {
-      const options = {
-        feeds: [
-          {
-            output: `rss.xml`,
-            query: `{}`,
-            serialize: () => {}
-          }
-        ]
-      };
-
-      const [reporter] = await setup(options);
-
-      expect(reporter.warn).toHaveBeenCalledTimes(1);
-      expect(reporter.warn).toHaveBeenCalledWith(
-        expect.stringContaining(`title`)
-      );
-    });
-
-    it(`warns when individual feed does not have serialize function`, async () => {
-      const options = {
-        feeds: [
-          {
-            output: `rss.xml`,
-            query: `{}`,
-            title: `my feed`
-          }
-        ]
-      };
-
-      const [reporter] = await setup(options);
-
-      expect(reporter.warn).toHaveBeenCalledTimes(1);
-      expect(reporter.warn).toHaveBeenCalledWith(
-        expect.stringContaining(deprecationNotice)
-      );
-    });
-
-    it(`throws when invalid plugin options`, async () => {
-      const invalidOptions = [
-        {
-          feeds: [
-            {
-              // output is missing
-              query: `{}`
-            }
-          ]
-        },
-        {
-          feeds: [
-            {
-              output: `rss.xml`
-              // query is missing
-            }
-          ]
-        }
-      ];
-
-      for (let options of invalidOptions) {
-        try {
-          await setup(options);
-        } catch (e) {
-          expect(e).toMatchSnapshot();
-        }
-      }
-
-      expect.assertions(invalidOptions.length);
-    });
-  });
-
-  it(`default settings work properly`, async () => {
-    fs.writeFile = jest.fn();
-    fs.writeFile.mockResolvedValue(true);
-    const graphql = jest.fn();
-    graphql.mockResolvedValue({
-      data: {
-        site: {
-          siteMetadata: {
-            title: `a sample title`,
-            description: `a description`,
-            siteUrl: `http://dummy.url/`
-          }
-        },
-        allMdx: {
-          edges: [
-            {
-              node: {
-                fields: {
-                  slug: `a-slug`
-                },
-                excerpt: `post description`
-              }
-            }
-          ]
-        }
-      }
-    });
-    await onPostBuild({ graphql }, {});
-    const [filePath, contents] = fs.writeFile.mock.calls[0];
-    expect(filePath).toEqual(path.join(`public`, `rss.xml`));
-    expect(contents).toMatchSnapshot();
   });
 
   it(`custom properties work properly`, async () => {
@@ -160,30 +25,30 @@ describe(`Test plugin feed`, async () => {
           siteMetadata: {
             title: `site title`,
             description: `a description`,
-            siteUrl: `http://dummy.url/`
-          }
+            siteUrl: `http://dummy.url/`,
+          },
         },
         allMdx: {
           edges: [
             {
               node: {
                 frontmatter: {
-                  path: `a-custom-path`
+                  path: `a-custom-path`,
                 },
-                excerpt: `post description`
-              }
+                excerpt: `post description`,
+              },
             },
             {
               node: {
                 frontmatter: {
-                  path: `another-custom-path`
+                  path: `another-custom-path`,
                 },
-                excerpt: `post description`
-              }
-            }
-          ]
-        }
-      }
+                excerpt: `post description`,
+              },
+            },
+          ],
+        },
+      },
     });
     const customQuery = `
     {
@@ -210,15 +75,15 @@ describe(`Test plugin feed`, async () => {
           generator: `custom generator`,
           query: customQuery,
           serialize: ({ query: { site, allMdx } }) =>
-            allMdx.edges.map(edge => {
+            allMdx.edges.map((edge) => {
               return {
                 ...edge.node.frontmatter,
                 description: edge.node.excerpt,
-                url: site.siteMetadata.siteUrl + edge.node.frontmatter.path
+                url: site.siteMetadata.siteUrl + edge.node.frontmatter.path,
               };
-            })
-        }
-      ]
+            }),
+        },
+      ],
     };
     await onPostBuild({ graphql }, options);
     const [filePath, contents] = fs.writeFile.mock.calls[0];
@@ -236,30 +101,30 @@ describe(`Test plugin feed`, async () => {
           siteMetadata: {
             title: `a sample title`,
             description: `a description`,
-            siteUrl: `http://dummy.url/`
-          }
+            siteUrl: `http://dummy.url/`,
+          },
         },
         allMdx: {
           edges: [
             {
               node: {
                 frontmatter: {
-                  path: `a-custom-path`
+                  path: `a-custom-path`,
                 },
-                excerpt: `post description`
-              }
+                excerpt: `post description`,
+              },
             },
             {
               node: {
                 frontmatter: {
-                  path: `another-custom-path`
+                  path: `another-custom-path`,
                 },
-                excerpt: `post description`
-              }
-            }
-          ]
-        }
-      }
+                excerpt: `post description`,
+              },
+            },
+          ],
+        },
+      },
     });
     const customQuery = `
     {
@@ -282,17 +147,17 @@ describe(`Test plugin feed`, async () => {
         {
           output: `rss_new.xml`,
           serialize: ({ query: { site, allMdx } }) =>
-            allMdx.edges.map(edge => {
+            allMdx.edges.map((edge) => {
               return {
                 ...edge.node.frontmatter,
                 description: edge.node.excerpt,
-                url: site.siteMetadata.siteUrl + edge.node.frontmatter.path
+                url: site.siteMetadata.siteUrl + edge.node.frontmatter.path,
               };
             }),
           query: customQuery,
-          title: `my feed`
-        }
-      ]
+          title: `my feed`,
+        },
+      ],
     };
     await onPostBuild({ graphql }, options);
     const [filePath, contents] = fs.writeFile.mock.calls[0];
@@ -309,10 +174,10 @@ describe(`Test plugin feed`, async () => {
       data: {
         site: {
           siteMetadata: {
-            title: `Hello World`
-          }
-        }
-      }
+            title: `Hello World`,
+          },
+        },
+      },
     };
 
     const mdxQuery = {
@@ -322,16 +187,16 @@ describe(`Test plugin feed`, async () => {
             {
               node: {
                 fields: {
-                  slug: `/hello-world`
+                  slug: `/hello-world`,
                 },
                 frontmatter: {
-                  title: `Hello World`
-                }
-              }
-            }
-          ]
-        }
-      }
+                  title: `Hello World`,
+                },
+              },
+            },
+          ],
+        },
+      },
     };
 
     const graphql = jest
@@ -344,17 +209,23 @@ describe(`Test plugin feed`, async () => {
       feeds: [
         {
           output: `rss.xml`,
-          query: `{ firstMdxQuery }`
-        }
-      ]
+          query: `{ firstMdxQuery }`,
+          serialize: ({ query: { allMdx } }) =>
+            allMdx.edges.map((edge) => {
+              return {
+                ...edge.node.frontmatter,
+              };
+            }),
+        },
+      ],
     };
 
     await onPostBuild({ graphql }, options);
 
     expect(siteQuery).toEqual({
       data: {
-        site: expect.any(Object)
-      }
+        site: expect.any(Object),
+      },
     });
   });
 });
