@@ -8,9 +8,6 @@ export const runQuery = (handler, query) =>
   });
 
 export const defaultOptions = {
-  // Override if you want to manually specify the RSS "generator" tag.
-  generator: `GatsbyJS`,
-
   // Run a default query to gather some information about the site.
   query: `
   {
